@@ -9,14 +9,39 @@
     <style>
         body {
             font-family: "Inter", sans-serif;
+            margin: 0; /* Garante que não há margem padrão no body */
+            padding: 0; /* Garante que não há padding padrão no body */
+            overflow-x: hidden; /* Evita rolagem horizontal */
+        }
+        #app-container {
+            min-height: 100vh; /* Ocupa a altura total da viewport */
+            display: flex; /* Para centralizar o conteúdo verticalmente */
+            flex-direction: column; /* Para empilhar o conteúdo */
         }
         .screen {
             display: none; /* Todas as telas ocultas por padrão */
+            flex: 1; /* Ocupa o espaço disponível */
+            width: 100%; /* Ocupa a largura total */
+            padding: 0; /* Remove padding padrão */
         }
         .screen.active {
-            display: block; /* A tela ativa é exibida */
+            display: flex; /* Usa flexbox para centralizar conteúdo */
+            flex-direction: column; /* Conteúdo empilhado */
+            align-items: center; /* Centraliza horizontalmente */
+            justify-content: center; /* Centraliza verticalmente */
         }
-        /* Animações CSS */
+        /* Ajustes específicos para o conteúdo dentro das telas */
+        .screen > div { /* Para os cards internos de cada tela */
+            width: 100%; /* Ocupa a largura total da tela */
+            max-width: none; /* Remove a largura máxima */
+            border-radius: 0; /* Remove bordas arredondadas dos cards */
+            box-shadow: none; /* Remove sombras dos cards */
+            padding: 1rem; /* Adiciona um padding interno para o conteúdo não colar nas bordas */
+            margin-top: 0; /* Remove margem superior */
+            margin-bottom: 0; /* Remove margem inferior */
+        }
+
+        /* Classes de transição e animação */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -37,6 +62,50 @@
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
         .animate-zoom-in { animation: zoomIn 0.3s ease-out; }
+
+        /* Ajustes para o fundo gradiente ocupar 100% da tela */
+        #auth-screen {
+            background: linear-gradient(to bottom right, var(--tw-gradient-stops));
+            --tw-gradient-stops: var(--tw-gradient-from) , var(--tw-gradient-to);
+            --tw-gradient-from: #a78bfa; /* purple-400 */
+            --tw-gradient-to: #4f46e5; /* indigo-600 */
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Ajuste para telas de conteúdo que não são a de autenticação */
+        #home-screen, #profile-screen, #create-event-screen, #edit-event-screen, #event-detail-screen, #global-chat-screen {
+            padding: 1rem; /* Adiciona um padding geral para o conteúdo não colar nas bordas da tela */
+            box-sizing: border-box; /* Garante que padding não adicione largura extra */
+        }
+        #home-screen > h1, #home-screen > h2 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        #events-list {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        #events-list > div { /* Ajusta os cards de evento dentro da lista */
+            border-radius: 0; /* Remove bordas arredondadas dos cards de evento */
+            box-shadow: none; /* Remove sombras dos cards de evento */
+            border: none; /* Remove bordas dos cards de evento */
+        }
+        #profile-screen > div, #create-event-screen > div, #edit-event-screen > div, #event-detail-screen > div, #global-chat-screen > div {
+            padding: 1rem; /* Padding interno para o conteúdo dos formulários/detalhes */
+        }
+
+        /* Ajuste para o input de busca e filtro na tela inicial */
+        #home-screen .mb-4.space-y-3 {
+            padding: 0 1rem; /* Adiciona padding horizontal para os inputs de busca */
+        }
+        /* Ajuste para os botões da barra de navegação inferior */
+        #bottom-nav {
+            border-top: none; /* Remove a borda superior da nav */
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06); /* Mantém uma sombra sutil */
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-gray-900 bg-gray-50 min-h-screen">
@@ -45,8 +114,8 @@
     <div id="app-container" class="min-h-screen">
 
         <!-- Auth Screen -->
-        <div id="auth-screen" class="screen active min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-600 p-4">
-            <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-500 ease-in-out scale-95 hover:scale-100">
+        <div id="auth-screen" class="screen active min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 to-indigo-600 p-0">
+            <div class="bg-white p-8 w-full h-full flex flex-col justify-center items-center">
                 <h1 class="text-4xl font-extrabold text-center text-indigo-700 mb-2 animate-fade-in-down">
                     Não quero ir só
                 </h1>
@@ -56,7 +125,7 @@
                 <h2 id="auth-title" class="text-3xl font-bold text-center text-gray-800 mb-6">
                     Entrar
                 </h2>
-                <form id="auth-form" class="space-y-4">
+                <form id="auth-form" class="space-y-4 w-full px-4">
                     <div>
                         <label class="block text-gray-700 text-sm font-semibold mb-2" for="auth-email">
                             Email
@@ -115,19 +184,19 @@
         </div>
 
         <!-- Home/Event List Screen -->
-        <div id="home-screen" class="screen min-h-screen bg-gray-100 p-4 pb-20 overflow-y-auto">
-            <h1 class="text-4xl font-extrabold text-center text-indigo-700 mb-6 animate-fade-in-down">
+        <div id="home-screen" class="screen min-h-screen bg-gray-100 p-0 pb-20 overflow-y-auto">
+            <h1 class="text-4xl font-extrabold text-center text-indigo-700 mb-6 animate-fade-in-down pt-4">
                 Não quero ir só
             </h1>
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Eventos Próximos</h2>
             <button
                 id="create-event-btn"
-                class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-green-600 transition duration-300 transform hover:scale-105 mb-4 shadow-md"
+                class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-green-600 transition duration-300 transform hover:scale-105 mb-4 shadow-md px-4"
             >
                 + Criar Novo Evento
             </button>
 
-            <div class="mb-4 space-y-3">
+            <div class="mb-4 space-y-3 px-4">
                 <div class="relative">
                     <input
                         type="text"
@@ -147,17 +216,17 @@
                 <datalist id="location-suggestions-filter-datalist"></datalist>
             </div>
 
-            <div id="events-list" class="space-y-4">
+            <div id="events-list" class="space-y-4 px-4">
                 <!-- Events will be rendered here by JavaScript -->
             </div>
             <p id="no-events-message" class="text-center text-gray-600 mt-8 hidden">Nenhum evento encontrado. Crie um!</p>
         </div>
 
         <!-- Profile Screen -->
-        <div id="profile-screen" class="screen min-h-screen bg-gray-100 p-4 flex flex-col items-center">
-            <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl mx-auto mt-8 transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
+        <div id="profile-screen" class="screen min-h-screen bg-gray-100 p-0 flex flex-col items-center">
+            <div class="bg-white p-6 w-full h-full flex flex-col justify-center items-center">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Meu Perfil</h2>
-                <form id="profile-form" class="space-y-4">
+                <form id="profile-form" class="space-y-4 w-full px-4">
                     <div class="flex flex-col items-center mb-4">
                         <img
                             id="profile-image-preview"
@@ -234,7 +303,7 @@
                     </button>
                 </form>
 
-                <div class="mt-6 space-y-3">
+                <div class="mt-6 space-y-3 w-full px-4">
                     <button
                         id="change-password-btn"
                         class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105 shadow-md"
@@ -249,7 +318,7 @@
                     </button>
                 </div>
 
-                <div class="mt-8 text-center text-gray-600 text-sm">
+                <div class="mt-8 text-center text-gray-600 text-sm w-full">
                     <a href="https://x.com/LuhHeenry" target="_blank" rel="noopener noreferrer" class="hover:underline text-indigo-600">
                         Ideia do app por @LuhHeenry
                     </a>
@@ -258,10 +327,10 @@
         </div>
 
         <!-- Create Event Screen -->
-        <div id="create-event-screen" class="screen min-h-screen bg-gray-100 p-4">
-            <div class="bg-white p-6 rounded-xl shadow-lg max-w-md mx-auto mt-8 transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
+        <div id="create-event-screen" class="screen min-h-screen bg-gray-100 p-0">
+            <div class="bg-white p-6 w-full h-full flex flex-col justify-center items-center">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Criar Novo Evento</h2>
-                <form id="create-event-form" class="space-y-4">
+                <form id="create-event-form" class="space-y-4 w-full px-4">
                     <div>
                         <label class="block text-gray-700 text-sm font-semibold mb-2" for="event-name">Nome do Evento</label>
                         <input
@@ -372,10 +441,10 @@
         </div>
 
         <!-- Edit Event Screen -->
-        <div id="edit-event-screen" class="screen min-h-screen bg-gray-100 p-4">
-            <div class="bg-white p-6 rounded-xl shadow-lg max-w-md mx-auto mt-8 transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
+        <div id="edit-event-screen" class="screen min-h-screen bg-gray-100 p-0">
+            <div class="bg-white p-6 w-full h-full flex flex-col justify-center items-center">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Editar Evento</h2>
-                <form id="edit-event-form" class="space-y-4">
+                <form id="edit-event-form" class="space-y-4 w-full px-4">
                     <div>
                         <label class="block text-gray-700 text-sm font-semibold mb-2" for="edit-event-name">Nome do Evento</label>
                         <input
@@ -486,8 +555,8 @@
         </div>
 
         <!-- Event Detail Screen -->
-        <div id="event-detail-screen" class="screen min-h-screen bg-gray-100 p-4 pb-20 overflow-y-auto">
-            <div class="bg-white p-6 rounded-xl shadow-lg max-w-md mx-auto mt-8 transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
+        <div id="event-detail-screen" class="screen min-h-screen bg-gray-100 p-0 pb-20 overflow-y-auto">
+            <div class="bg-white p-6 w-full h-full flex flex-col justify-center items-center">
                 <h2 id="event-detail-name" class="text-2xl font-bold text-gray-800 mb-4 text-center"></h2>
                 <p class="text-gray-600 mb-2"><span class="font-semibold">Data:</span> <span id="event-detail-date"></span> às <span id="event-detail-time"></span></p>
                 <p class="text-gray-600 mb-2"><span class="font-semibold">Local:</span> <span id="event-detail-location"></span></p>
@@ -517,7 +586,7 @@
                 </div>
 
                 <!-- Seção de Comentários -->
-                <div class="mt-8 border-t pt-6 border-gray-200">
+                <div class="mt-8 border-t pt-6 border-gray-200 w-full px-4">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Comentários</h3>
                     <div id="comments-list" class="space-y-4 max-h-60 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-200">
                         <!-- Comments will be rendered here by JavaScript -->
@@ -544,22 +613,22 @@
             <button
                 type="button"
                 id="event-detail-back-btn"
-                class="w-full mt-4 bg-gray-300 text-gray-800 py-3 rounded-lg font-semibold text-lg hover:bg-gray-400 transition duration-300"
+                class="w-full mt-4 bg-gray-300 text-gray-800 py-3 rounded-lg font-semibold text-lg hover:bg-gray-400 transition duration-300 px-4"
             >
                 Voltar
             </button>
         </div>
 
         <!-- Global Chat Screen -->
-        <div id="global-chat-screen" class="screen min-h-screen bg-gray-100 flex flex-col p-4 pb-20 overflow-y-auto items-center">
-            <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl flex-1 mb-4 flex flex-col transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
+        <div id="global-chat-screen" class="screen min-h-screen bg-gray-100 flex flex-col p-0 pb-20 overflow-y-auto items-center">
+            <div class="bg-white p-6 w-full h-full flex flex-col justify-center items-center">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Chat Global</h2>
-                <div id="messages-list" class="flex-1 overflow-y-auto mb-4 p-2 border rounded-lg bg-gray-50">
+                <div id="messages-list" class="flex-1 overflow-y-auto mb-4 p-2 border rounded-lg bg-gray-50 w-full">
                     <!-- Messages will be rendered here by JavaScript -->
                 </div>
                 <p id="no-messages-message" class="text-center text-gray-500 mt-4 hidden">Nenhuma mensagem ainda. Diga olá para todos!</p>
                 <p id="loading-messages-message" class="text-center text-gray-500 mt-4">Carregando mensagens...</p>
-                <div class="flex">
+                <div class="flex w-full">
                     <input
                         type="text"
                         id="chat-message-input"
@@ -816,14 +885,14 @@
         /**
          * Displays a floating message at the bottom of the screen.
          * @param {string} message The message to display.
-         * @param {'success'|'error'} type The type of message (determines color).
+         * @param {'success'|'error'|'info'} type The type of message (determines color).
          */
         function showMessage(message, type) {
             const container = document.getElementById('floating-message-container');
             if (!container) return;
 
             const messageElement = document.createElement('div');
-            messageElement.className = `fixed bottom-4 left-1/2 -translate-x-1/2 p-3 rounded-lg shadow-lg text-white z-50 flex items-center justify-between animate-fade-in-up ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            messageElement.className = `fixed bottom-4 left-1/2 -translate-x-1/2 p-3 rounded-lg shadow-lg text-white z-50 flex items-center justify-between animate-fade-in-up ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'}`;
             messageElement.innerHTML = `
                 <span>${message}</span>
                 <button class="ml-4 font-bold text-lg">X</button>
@@ -1014,7 +1083,7 @@
                 screen.style.display = 'none'; // Ensure it's hidden
             });
             document.getElementById(screenId).classList.add('active');
-            document.getElementById(screenId).style.display = 'block'; // Ensure it's shown
+            document.getElementById(screenId).style.display = 'flex'; // Use flex for centering content
 
             // Update active state for bottom navigation buttons
             if (appState.userId) {
@@ -2298,24 +2367,6 @@
                     );
                 });
             };
-        }
-
-        /**
-         * Deletes a chat message.
-         * @param {string} messageId The ID of the message to delete.
-         */
-        async function deleteChatMessage(messageId) {
-            if (!appState.db || !appState.projectId || !messageId) {
-                showMessage('Erro: Não foi possível apagar a mensagem.', 'error');
-                return;
-            }
-            try {
-                await deleteDoc(doc(appState.db, `artifacts/${appState.projectId}/public/data/global_chat_messages`, messageId));
-                showMessage('Mensagem apagada!', 'success');
-            } catch (error) {
-                console.error('Erro ao apagar mensagem:', error);
-                showMessage('Erro ao apagar mensagem.', 'error');
-            }
         }
 
 
